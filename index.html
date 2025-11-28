@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Gemini PDF 요약 서비스</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 800px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        h1 { color: #4285F4; }
+        #summary_result { margin-top: 20px; padding: 15px; background-color: #f9f9f9; border: 1px dashed #aaa; min-height: 100px; white-space: pre-wrap; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #4285F4; border-radius: 50%; width: 20px; height: 20px; animation: spin 2s linear infinite; display: none; margin: 10px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Gemini PDF 요약기</h1>
+        <p>요약할 PDF 파일을 선택하고 '요약 시작' 버튼을 눌러주세요.</p>
+        
+        <form id="upload_form">
+            <input type="file" id="pdf_file" accept=".pdf" required>
+            <button type="submit">요약 시작</button>
+        </form>
+
+        <div class="loader" id="loader"></div>
+        
+        <h2>요약 결과:</h2>
+        <div id="summary_result">여기에 요약 결과가 표시됩니다.</div>
+    </div>
+
+    <script>
+        document.getElementById('upload_form').addEventListener('submit', function(e) {
+            e.preventDefault(); // 기본 폼 제출 방지
+
+            const fileInput = document.getElementById('pdf_file');
+            const resultDiv = document.getElementById('summary_result');
+            const loader = document.getElementById('loader');
+            
+            if (fileInput.files.length === 0) {
+                alert('파일을 선택해 주세요.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('pdf_file', fileInput.files[0]);
+
+            resultDiv.textContent = '요약 진행 중... 잠시만 기다려 주세요.';
+            loader.style.display = 'block'; // 로딩 스피너 표시
+
+            fetch('/summarize', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                loader.style.display = 'none'; // 로딩 스피너 숨김
+                if (data.error) {
+                    resultDiv.textContent = '오류 발생: ' + data.error;
+                } else {
+                    resultDiv.textContent = data.summary;
+                }
+            })
+            .catch(error => {
+                loader.style.display = 'none';
+                resultDiv.textContent = '네트워크 오류가 발생했습니다: ' + error;
+            });
+        });
+    </script>
+</body>
+</html>
