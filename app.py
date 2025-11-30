@@ -20,7 +20,7 @@ from google.genai import types
 
 # API 키를 환경 변수에서 로드합니다.
 # ⚠️ 직접 키를 입력하려면 os.getenv('GEMINI_API_KEY') 대신 직접 키를 넣으세요.
-API_KEY = os.getenv('GEMINI_API_KEY') 
+API_KEY = os.getenv('GEMINI_API_KEY')
 
 if not API_KEY:
     print("FATAL ERROR: GEMINI_API_KEY 환경 변수가 설정되지 않았습니다.")
@@ -35,7 +35,7 @@ except Exception as e:
 
 
 # ----------------------------------------------------------------------
-# 2. PDF 처리 및 요약 로직 (기존 코드 재사용)
+# 2. PDF 처리 및 요약 로직
 # ----------------------------------------------------------------------
 
 def extract_text_from_pdf(pdf_path: str) -> str:
