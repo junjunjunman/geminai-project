@@ -50,3 +50,8 @@ project-summarizer/
 
          *  style.css
   *  uploads/
+
+
+## 화면
+<img width="839" height="588" alt="image" src="https://github.com/user-attachments/assets/98311a72-446c-4d0a-bbdc-e93f1d89a454" />
+
