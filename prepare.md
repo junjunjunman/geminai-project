@@ -34,3 +34,14 @@
 > python app.py
 
 터미널에 Running on http://127.0.0.1:5000/ 메시지가 뜨면, 웹 브라우저로 접속하여 서비스를 사용할 수 있습니다.
+---
+파일 내부구조
+project-summarizer/
+├── venv/
+├── app.py
+├── templates/
+│   └── index.html
+├── static/                  
+│   └── css/
+│       └── style.css         
+├── uploads/
