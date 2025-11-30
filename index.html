@@ -2,68 +2,104 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Gemini PDF 요약 서비스</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        .container { max-width: 800px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
-        h1 { color: #4285F4; }
-        #summary_result { margin-top: 20px; padding: 15px; background-color: #f9f9f9; border: 1px dashed #aaa; min-height: 100px; white-space: pre-wrap; }
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #4285F4; border-radius: 50%; width: 20px; height: 20px; animation: spin 2s linear infinite; display: none; margin: 10px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+    <title>공공문서 요약 및 행동 안내 AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>📚 Gemini PDF 요약기</h1>
-        <p>요약할 PDF 파일을 선택하고 '요약 시작' 버튼을 눌러주세요.</p>
-        
-        <form id="upload_form">
-            <input type="file" id="pdf_file" accept=".pdf" required>
-            <button type="submit">요약 시작</button>
-        </form>
+    <div class="hero">
+        <div class="container">
+            <h1>📄 공공문서 요약 및 행동 안내 AI</h1>
+            <p class="description">
+                복잡한 공공문서를 쉽게 요약하고, 지금 내가 해야 할 행동까지 안내해드립니다.
+            </p>
 
-        <div class="loader" id="loader"></div>
-        
-        <h2>요약 결과:</h2>
-        <div id="summary_result">여기에 요약 결과가 표시됩니다.</div>
+            <div id="drop_area">
+                <input type="file" id="pdf_file" accept=".pdf">
+            </div>
+
+            <button id="start_btn">요약 시작</button>
+
+            <div class="loader" id="loader"></div>
+
+            <h2>요약 결과</h2>
+            <div id="summary_result" class="result_card">
+                <span class="placeholder">여기에 요약 결과가 표시됩니다.</span>
+            </div>
+        </div>
     </div>
 
     <script>
-        document.getElementById('upload_form').addEventListener('submit', function(e) {
-            e.preventDefault(); // 기본 폼 제출 방지
+        const dropArea = document.getElementById('drop_area');
+        const fileInput = document.getElementById('pdf_file');
+        const startBtn = document.getElementById('start_btn');
+        const resultDiv = document.getElementById('summary_result');
+        const loader = document.getElementById('loader');
 
-            const fileInput = document.getElementById('pdf_file');
-            const resultDiv = document.getElementById('summary_result');
-            const loader = document.getElementById('loader');
-            
-            if (fileInput.files.length === 0) {
-                alert('파일을 선택해 주세요.');
+        let uploadedFile = null;
+
+        // 드래그 앤 드롭
+        dropArea.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropArea.classList.add('dragover');
+        });
+
+        dropArea.addEventListener('dragleave', e => {
+            e.preventDefault();
+            dropArea.classList.remove('dragover');
+        });
+
+        dropArea.addEventListener('drop', e => {
+            e.preventDefault();
+            dropArea.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                uploadedFile = e.dataTransfer.files[0];
+                fileInput.files = e.dataTransfer.files;
+            }
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                uploadedFile = fileInput.files[0];
+            }
+        });
+
+        startBtn.addEventListener('click', () => {
+            if (!uploadedFile) {
+                alert('PDF 파일을 선택해주세요.');
                 return;
             }
 
+            // 로딩 표시 및 이전 결과 초기화
+            resultDiv.innerHTML = '';
+            loader.style.display = 'block';
+
             const formData = new FormData();
-            formData.append('pdf_file', fileInput.files[0]);
+            formData.append('pdf_file', uploadedFile);
 
-            resultDiv.textContent = '요약 진행 중... 잠시만 기다려 주세요.';
-            loader.style.display = 'block'; // 로딩 스피너 표시
+            fetch('/summarize', { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    loader.style.display = 'none';
+                    resultDiv.innerHTML = ''; // 초기화
 
-            fetch('/summarize', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                loader.style.display = 'none'; // 로딩 스피너 숨김
-                if (data.error) {
-                    resultDiv.textContent = '오류 발생: ' + data.error;
-                } else {
-                    resultDiv.textContent = data.summary;
-                }
-            })
-            .catch(error => {
-                loader.style.display = 'none';
-                resultDiv.textContent = '네트워크 오류가 발생했습니다: ' + error;
-            });
+                    if (data.error) {
+                        resultDiv.innerHTML = `<span class="placeholder">오류 발생: ${data.error}</span>`;
+                    } else {
+                        // 요약 텍스트 강조
+                        const lines = data.summary.split('\n').map(line => {
+                            if (line.includes('해야 합니다') || line.includes('기한')) {
+                                return `<strong>${line}</strong>`;
+                            }
+                            return line;
+                        }).join('<br>');
+
+                        resultDiv.innerHTML = lines;
+                    }
+                })
+                .catch(err => {
+                    loader.style.display = 'none';
+                    resultDiv.innerHTML = `<span class="placeholder">네트워크 오류: ${err}</span>`;
+                });
         });
     </script>
 </body>
