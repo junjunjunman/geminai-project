@@ -1,0 +1,124 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #e0f7fa, #fff9c4);
+    color: #333;
+}
+
+.hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 700px;
+    width: 100%;
+    background-color: #ffffff;
+    padding: 35px 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+h1 {
+    color: #00796b;
+    margin-bottom: 12px;
+    font-size: 2rem;
+    letter-spacing: -0.5px;
+}
+
+.description {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 25px;
+    line-height: 1.6;
+    letter-spacing: -0.3px;
+}
+
+#drop_area {
+    padding: 20px;
+    border: 2px dashed #00796b;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    transition: 0.3s;
+    cursor: pointer;
+    background-color: #e0f2f1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#drop_area.dragover {
+    background-color: #b2dfdb;
+}
+
+#drop_area input[type="file"] {
+    display: inline-block;
+}
+
+button {
+    background-color: #00796b;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #004d40;
+}
+
+.result_card {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f1f8e9;
+    min-height: 120px;
+    white-space: pre-wrap;
+    text-align: left;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    line-height: 1.6;
+    letter-spacing: -0.2px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-direction: column;
+}
+
+.result_card .placeholder {
+    color: #888;
+    text-align: center;
+}
+
+.result_card strong {
+    color: #d32f2f;
+    font-weight: bold;
+}
+
+.loader {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #00796b;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    animation: spin 1s linear infinite;
+    display: none;
+    margin: 15px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 600px) {
+    h1 { font-size: 1.6rem; }
+    .description { font-size: 0.95rem; }
+}
